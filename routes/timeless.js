@@ -42,4 +42,15 @@ router.post("/", async (req, res) => {
   }
 });
 
+//Test route
+router.post("/test", async (req, res) => {
+  try {
+    console.log(req.body);
+    return res.status(200).send(req.body);
+  } catch (e) {
+    console.log(e);
+    return res.status(500).send(e);
+  }
+});
+
 module.exports = router;
