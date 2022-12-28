@@ -1,0 +1,5 @@
+{
+  "jwtPrivateKey": "timeless_jwtPrivateKey",
+  "OPENAI_API_KEY": "timeless_OPENAI_API_KEY",
+  "D-ID_API_KEY": "timeless_D-ID_API_KEY"
+}

@@ -1,0 +1,21 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "Launch Program",
+      "skipFiles": ["<node_internals>/**"],
+      "env": {
+        "timeless_jwtPrivateKey": "qwerty123",
+        "timeless_OPENAI_API_KEY": "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",
+        "timeless_D-ID_API_KEY": "sk_test_fPrsPRefwR1nKEPfj1GMMxlt00Py8V2Iay",
+        "NODE_ENV": "development"
+      },
+      "program": "${workspaceFolder}/index.js"
+    }
+  ]
+}
