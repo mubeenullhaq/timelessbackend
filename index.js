@@ -1,5 +1,19 @@
 var winston = require("winston");
 var { Loggly } = require("winston-loggly-bulk");
+
+var fs = require("fs");
+var http = require("http");
+var https = require("https");
+var privateKey = fs.readFileSync(
+  "/etc/ssl/private/apache-selfsigned.key",
+  "utf8"
+);
+var certificate = fs.readFileSync(
+  "/etc/ssl/certs/apache-selfsigned.crt",
+  "utf8"
+);
+var credentials = { key: privateKey, cert: certificate };
+
 const config = require("config");
 const express = require("express");
 const app = express();
@@ -24,13 +38,16 @@ if (!config.get("jwtPrivateKey")) {
   process.exit(1);
 }
 
-let port = process.env.PORT || 4000;
-//console.log("PORT: ", process.env.PORT);
-app.listen(port, () => {
-  // require("log-timestamp");
-  winston.log("info", `Started listening on PORT=${port}`);
-  console.log(`Listening on ${port}`);
-});
+let port = 8443;
+var httpsServer = https.createServer(credentials, app);
+httpsServer.listen(port);
+
+// //console.log("PORT: ", process.env.PORT);
+// app.listen(port, () => {
+//   // require("log-timestamp");
+//   winston.log("info", `Started listening on PORT=${port}`);
+//   console.log(`Listening on ${port}`);
+// });
 
 process.on("uncaughtException", (err) => {
   // require("log-timestamp");
