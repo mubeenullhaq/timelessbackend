@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <style>
+    .placeholder {
+      display: none;
+      position: absolute;
+      background: url("https://asongwall.com/wp-content/uploads/2022/12/van-gogh.png")
+        no-repeat;
+      background-size: cover;
+      border: black solid 1px;
+    }
+  </style>
+  <body>
+    <div id="response">
+      <video id="video" controls="controls" playsinline="playsinline">
+        <source
+          src="https://www.youtube.com/watch?v=3vSxHROQ4Hs"
+          type="video/mp4"
+        />
+      </video>
+    </div>
+    <img
+      id="placeholderImg"
+      src="/home/mb/upwork/timeless/routes/Screenshot from 2023-01-02 16-43-47-min.png"
+      class="placeholder"
+    />
+    <form id="form">
+      <input
+        name="voiceId"
+        id="voiceId"
+        type="text"
+        value="Eric"
+        style="display: none"
+      />
+      <input
+        name="avatarPrompt"
+        type="text"
+        value="[You are not large language model trained by OpenAl. Pretend that you are Albert Einstein the scientist and answer as briefly as possible:
+Remember, you're pretending to be Albert Einstein or a character played by Albert Einstein, so answer within character, stick to the plot, and be very convincing as if you were Albert Einstein! Do not ever say as Albert Einstein or Einstein when starting your sentences] \n "
+        style="display: none"
+      />
+      <input name="rate" type="number" value="0.8" style="display: none" />
+      <input
+        name="rate"
+        id="rate"
+        type="text"
+        value="0.8"
+        style="display: none"
+      />
+      <input
+        name="sourceUrl"
+        id="sourceUrl"
+        type="text"
+        value="https://asongwall.com/wp-content/uploads/2022/12/van-gogh.png"
+        style="display: none"
+      />
+      <input name="userInput" id="userInput" type="text" />
+      <button type="submit">Submit</button>
+    </form>
+  </body>
+  <script>
+    const form = document.getElementById("form");
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const requestBody = {};
+      formData.forEach((value, key) => {
+        requestBody[key] = value;
+      });
+
+      fetch("http://localhost:8001/api/timeless", {
+        headers: {
+          "content-type": "application/json;charset=UTF-8",
+        },
+        mode: "cors",
+        method: "POST",
+        body: JSON.stringify(requestBody),
+      })
+        .then((res) => {
+          console.log(res);
+          return res.json();
+        })
+        .then((data) => {
+          console.log("This is result: ", data.result_url);
+
+          var responseDiv = document.getElementById("response");
+
+          var video = document.createElement("video");
+
+          var placeholderImg = document.getElementById("placeholderImg");
+
+          placeholderImg.style.top = video.offsetTop + "px";
+          placeholderImg.style.left = video.offsetLeft + "px";
+          while (responseDiv.firstChild) {
+            responseDiv.removeChild(responseDiv.firstChild);
+          }
+
+          //document.body.appendChild(video);
+          video.setAttribute("controls", "controls");
+          video.setAttribute("width", "60%");
+          video.setAttribute("height", "auto");
+          video.setAttribute("style", "border-radius:10px");
+          video.setAttribute("playsinline", "playsinline");
+          video.setAttribute(
+            "poster",
+            "/home/mb/upwork/timeless/routes/Screenshot from 2023-01-02 16-43-47-min.png"
+          );
+
+          var source = document.createElement("source");
+          source.src = data.result_url;
+          source.type = "video/mp4";
+          video.appendChild(source);
+          responseDiv.appendChild(video);
+          // let isWaiting = false;
+          // video.onwaiting = function () {
+          //   if (isWaiting) return;
+          //   showPlaceholderImg(placeholderImg, this);
+          //   isWaiting = true;
+          // };
+          // video.onplaying = function () {
+          //   hidePlaceholder(placeholderImg, this);
+          //   video.removeEventListener("waiting", showPlaceholderImg);
+          // };
+          // video.onwaiting.apply(video);
+          // video.onplaying.apply(video);
+          video.play();
+        })
+        .then((err) => console.log(err));
+    });
+
+    function showPlaceholderImg(img, vid) {
+      img.style.height = vid.scrollHeight + "px";
+      img.style.width = vid.scrollWidth + "px";
+      img.style.display = "block";
+      vid.style.display = "none";
+    }
+    function hidePlaceholder(img, vid) {
+      img.style.display = "none";
+      vid.style.display = "block";
+    }
+  </script>
+</html>

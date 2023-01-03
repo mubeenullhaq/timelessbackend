@@ -73,7 +73,7 @@ async function d_idGetRequest(_videoId) {
       };
       request(options, function (error, response) {
         if (error) throw new Error(error);
-        console.log(response.body);
+        //console.log(response.body);
         // let tempbody = response.body;
         // response.body =
         //   '{"metadata":{"driver_url":"bank://lively/driver-06/original","mouth_open":false,"num_faces":1,"num_frames":444,"processing_fps":49.26124224204778,"resolution":[512,512],"size_kib":4682.0634765625}}';

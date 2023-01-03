@@ -12,25 +12,47 @@ console.log(config.get("OPENAI_API_KEY"));
 router.post("/", async (req, res) => {
   try {
     console.log(config.get("OPENAI_API_KEY"));
-    console.log(req.body.userInput);
-    // let OpenAIres = await openAIreq(req.body.userInput);
-    // console.log(OpenAIres);
-    // const openAIresponse = OpenAIres.data.choices[0].text;
-    // //Call D-ID API end point with source URL to create video
-    // let d_idresponse = await d_idPostRequest(
-    //   openAIresponse,
-    //   "Diego",
-    //   "0.8",
-    //   "https://asongwall.com/wp-content/uploads/2022/12/van-gogh.png"
-    // );
-    let d_idVideoObj = await d_idGetRequest("tlk_JVEW22GZLFuh-ECk3EwRY");
-    //let d_idVideoObj = await d_idGetRequest(d_idresponse.body.id);
+    console.log("USerinput", req.body.userInput);
+    console.log("vocie id", req.body.voiceId);
+    let prompt = req.body.avatarPrompt + req.body.userInput;
+    let OpenAIres = await openAIreq(prompt);
+    console.log(OpenAIres);
+    const openAIresponse = OpenAIres.data.choices[0].text;
+    console.log(
+      "/////////////////////////////////////////OpenAI Answer: ",
+      openAIresponse
+    );
+
+    //Call D-ID API end point with source URL to create video
+    let d_idresponse = await d_idPostRequest(
+      openAIresponse,
+      req.body.voiceId,
+      "0.8",
+      "https://asongwall.com/wp-content/uploads/2022/12/van-gogh.png"
+    );
+    console.log(
+      "/////////////////////////////////////////Video Id: ",
+      d_idresponse.body.id
+    );
+
+    //let d_idVideoObj = await d_idGetRequest("tlk_flpQPBFy3ev5YT4elxUmG");
+    let d_idVideoObj = await d_idGetRequest(d_idresponse.body.id);
     d_idVideoObj = JSON.parse(d_idVideoObj);
-    console.log(d_idVideoObj.result_url);
+    console.log(
+      "/////////////////////////////////////////Video URL",
+      d_idVideoObj.result_url
+    );
     if (!d_idVideoObj.result_url) {
       d_idVideoObj.result_url = await isResultUrlAvailable(
-        "tlk_JVEW22GZLFuh-ECk3EwRY"
+        d_idresponse.body.id
       );
+      console.log(
+        "/////////////////////////////////////////Video URL",
+        d_idVideoObj.result_url
+      );
+      // d_idVideoObj.result_url = await isResultUrlAvailable(
+      //   "tlk_flpQPBFy3ev5YT4elxUmG"
+      // );
     }
     return res.status(200).send({ result_url: d_idVideoObj.result_url });
   } catch (e) {

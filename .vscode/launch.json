@@ -11,7 +11,7 @@
       "skipFiles": ["<node_internals>/**"],
       "env": {
         "timeless_jwtPrivateKey": "qwerty123",
-        "timeless_OPENAI_API_KEY": "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",
+        "timeless_OPENAI_API_KEY": "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",
         "timeless_D-ID_API_KEY": "sk_test_fPrsPRefwR1nKEPfj1GMMxlt00Py8V2Iay",
         "NODE_ENV": "development"
       },
