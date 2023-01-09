@@ -12,7 +12,7 @@ console.log(config.get("OPENAI_API_KEY"));
 router.post("/", async (req, res) => {
   try {
     console.log(config.get("OPENAI_API_KEY"));
-    console.log("USerinput", req.body.userInput);
+    console.log("userInput", req.body.userInput);
     console.log("vocie id", req.body.voiceId);
     let prompt = req.body.avatarPrompt + req.body.userInput;
     let OpenAIres = await openAIreq(prompt);
@@ -27,14 +27,44 @@ router.post("/", async (req, res) => {
     let d_idresponse = await d_idPostRequest(
       openAIresponse,
       req.body.voiceId,
-      "0.8",
-      "https://asongwall.com/wp-content/uploads/2022/12/van-gogh.png"
+      req.body.rate,
+      req.body.sourceUrl
     );
     console.log(
       "/////////////////////////////////////////Video Id: ",
       d_idresponse.body.id
     );
 
+    //let d_idVideoObj = await d_idGetRequest("tlk_2d-Sr1ZhOGCg9FgZj_wGU");
+    let d_idVideoObj = await d_idGetRequest(d_idresponse.body.id);
+    d_idVideoObj = JSON.parse(d_idVideoObj);
+    console.log(
+      "/////////////////////////////////////////Video URL",
+      d_idVideoObj.result_url
+    );
+    if (!d_idVideoObj.result_url) {
+      d_idVideoObj.result_url = await isResultUrlAvailable(
+        d_idresponse.body.id
+      );
+      console.log(
+        "/////////////////////////////////////////Video URL",
+        d_idVideoObj.result_url
+      );
+      // d_idVideoObj.result_url = await isResultUrlAvailable(
+      //   "tlk_2d-Sr1ZhOGCg9FgZj_wGU"
+      // );
+    }
+    return res.status(200).send({ result_url: d_idVideoObj.result_url });
+  } catch (e) {
+    console.log(e);
+    return res.status(500).send(e);
+  }
+});
+
+//Test route
+router.post("/test", async (req, res) => {
+  try {
+    console.log("Request Body:  ", req.body);
     //let d_idVideoObj = await d_idGetRequest("tlk_flpQPBFy3ev5YT4elxUmG");
     let d_idVideoObj = await d_idGetRequest(d_idresponse.body.id);
     d_idVideoObj = JSON.parse(d_idVideoObj);
@@ -55,18 +85,6 @@ router.post("/", async (req, res) => {
       // );
     }
     return res.status(200).send({ result_url: d_idVideoObj.result_url });
-  } catch (e) {
-    console.log(e);
-    return res.status(500).send(e);
-  }
-});
-
-//Test route
-router.post("/test", async (req, res) => {
-  try {
-    console.log(req.body.userInput);
-    console.log(req.body);
-    return res.status(200).send(req.body);
   } catch (e) {
     console.log(e);
     return res.status(500).send(e);
