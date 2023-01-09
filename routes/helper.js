@@ -6,6 +6,7 @@ const configuration = new Configuration({
   apiKey: config.get("OPENAI_API_KEY"),
 });
 const openai = new OpenAIApi(configuration);
+const fs = require("fs");
 //console.log(config.get("OPENAI_API_KEY"));
 
 async function openAIreq(_text) {
@@ -35,7 +36,7 @@ async function d_idPostRequest(_inputText, _voiceId, _rate, _sourceUrl) {
         headers: {
           accept: "application/json",
           "content-type": "application/json",
-          authorization: "Basic Y29uaWRpZ0BnbWFpbC5jb20:EnMMJcX1OS-2P6aCeSHR1",
+          authorization: "Basic Y29uaWRpZ0BnbWFpbC5jb20:9qjPErvy8f-IXl65QBzIi",
         },
         body: {
           script: {
@@ -68,9 +69,26 @@ async function d_idGetRequest(_videoId) {
         url: `https://api.d-id.com/talks/${_videoId}`,
         headers: {
           accept: "application/json",
-          authorization: "Basic Y29uaWRpZ0BnbWFpbC5jb20:EnMMJcX1OS-2P6aCeSHR1",
+          authorization: "Basic Y29uaWRpZ0BnbWFpbC5jb20:9qjPErvy8f-IXl65QBzIi",
         },
       };
+      var data = fs.readFileSync("requestlog.js");
+      var myObject = JSON.parse(data);
+      const epoch = Date.now();
+      const ISOtime = new Date();
+      let obj = {
+        epoch: epoch,
+        UTCtime: ISOtime.toUTCString(),
+        reqOptions: options,
+      };
+      myObject.push(obj);
+      var newObj = JSON.stringify(myObject);
+      fs.writeFile("requestlog.js", newObj, (err) => {
+        // error checking
+        if (err) throw err;
+
+        console.log("New data added");
+      });
       request(options, function (error, response) {
         if (error) throw new Error(error);
         //console.log(response.body);
@@ -89,12 +107,24 @@ async function d_idGetRequest(_videoId) {
 async function isResultUrlAvailable(_videoId) {
   return new Promise(async function (resolve, reject) {
     try {
+      let counter = 0;
+      let isReqSent = false;
       let interval = setInterval(async () => {
-        let d_idVideoObj = await d_idGetRequest(_videoId);
-        d_idVideoObj = JSON.parse(d_idVideoObj);
-        if (d_idVideoObj.result_url) {
-          resolve(d_idVideoObj.result_url);
-          clearInterval(interval);
+        counter++;
+        if (!isReqSent) {
+          console.log("Sending Request: ", counter);
+          isReqSent = true;
+
+          let d_idVideoObj = await d_idGetRequest(_videoId);
+          d_idVideoObj = JSON.parse(d_idVideoObj);
+          if (d_idVideoObj.result_url) {
+            resolve(d_idVideoObj.result_url);
+            clearInterval(interval);
+          } else {
+            isReqSent = false;
+          }
+        } else {
+          console.log("Not Sending Request", counter);
         }
       }, 1000);
     } catch (err) {
